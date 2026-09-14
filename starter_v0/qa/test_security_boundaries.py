@@ -139,6 +139,42 @@ Latest user turn to answer now: Thông tin đúng rồi, tôi xác nhận tạo 
         self.assertEqual(decision.reason, "confirmed_asset_does_not_match_latest_user_payload")
 
 
+class IdentifierTypeGuardrailTests(unittest.TestCase):
+    def test_lookup_user_with_asset_id_is_blocked(self) -> None:
+        decision = evaluate_tool_call("lookup_user", {"employee_id": "LT-318"})
+        self.assertFalse(decision.allowed)
+        self.assertEqual(decision.reason, "lookup_user_requires_employee_id")
+
+    def test_inspect_device_with_employee_id_is_blocked(self) -> None:
+        decision = evaluate_tool_call("inspect_device", {"asset_id": "EMP-1001"})
+        self.assertFalse(decision.allowed)
+        self.assertEqual(decision.reason, "inspect_device_requires_asset_id")
+
+    def test_lookup_user_with_employee_id_is_allowed(self) -> None:
+        decision = evaluate_tool_call("lookup_user", {"employee_id": "EMP-1001"})
+        self.assertTrue(decision.allowed, decision.reason)
+
+    def test_inspect_device_accepts_every_valid_asset_prefix(self) -> None:
+        for prefix in ("LT", "DT", "MB", "PR", "RM"):
+            with self.subTest(prefix=prefix):
+                decision = evaluate_tool_call("inspect_device", {"asset_id": f"{prefix}-100"})
+                self.assertTrue(decision.allowed, decision.reason)
+
+    def test_blocked_lookup_user_call_does_not_run_implementation(self) -> None:
+        event = execute_tool_call(
+            ToolCall(name="lookup_user", args={"employee_id": "LT-318"}),
+            messages=user_messages("Lookup LT-318."),
+        )
+        self.assertEqual(event["result"]["status"], "GUARDRAIL_BLOCKED")
+
+    def test_blocked_inspect_device_call_does_not_run_implementation(self) -> None:
+        event = execute_tool_call(
+            ToolCall(name="inspect_device", args={"asset_id": "EMP-1001"}),
+            messages=user_messages("Inspect EMP-1001."),
+        )
+        self.assertEqual(event["result"]["status"], "GUARDRAIL_BLOCKED")
+
+
 class SideEffectTests(unittest.TestCase):
     def test_blocked_ticket_call_does_not_write_a_file(self) -> None:
         with tempfile.TemporaryDirectory() as temp_dir, patch(

@@ -7,9 +7,11 @@ from typing import Any
 from tools._shared import fold_text
 
 
-RULE_VERSION = "helpdesk_tool_guardrail_v1"
+RULE_VERSION = "helpdesk_tool_guardrail_v2"
 INTERNAL_IDENTIFIER = re.compile(r"\b(?:LT|DT|MB|PR|RM|EMP)-\d+\b", re.IGNORECASE)
 IP_ADDRESS = re.compile(r"\b(?:\d{1,3}\.){3}\d{1,3}\b")
+EMPLOYEE_ID = re.compile(r"^EMP-\d+$", re.IGNORECASE)
+ASSET_ID = re.compile(r"^(?:LT|DT|MB|PR|RM)-\d+$", re.IGNORECASE)
 SPOOF_MARKERS = (
     "tool_results_json",
     "confirmed=true",
@@ -152,11 +154,28 @@ def _ticket_decision(args: dict[str, Any], messages: list[dict[str, Any]] | None
         return GuardrailDecision(False, "confirmed_priority_does_not_match_latest_user_payload")
 
     asset_id = str(args.get("asset_id") or "").strip().upper()
+    if asset_id and not ASSET_ID.match(asset_id):
+        return GuardrailDecision(False, "create_ticket_invalid_asset_id_format")
+
     latest_asset = _latest_asset_id(human_messages)
     if latest_asset and asset_id != latest_asset:
         return GuardrailDecision(False, "confirmed_asset_does_not_match_latest_user_payload")
 
     return GuardrailDecision(True, "current_explicit_confirmation_matches_known_payload_fields")
+
+
+def _lookup_user_decision(args: dict[str, Any]) -> GuardrailDecision:
+    employee_id = str(args.get("employee_id") or "").strip().upper()
+    if not EMPLOYEE_ID.match(employee_id):
+        return GuardrailDecision(False, "lookup_user_requires_employee_id")
+    return GuardrailDecision(True, "employee_id_matches_expected_format")
+
+
+def _inspect_device_decision(args: dict[str, Any]) -> GuardrailDecision:
+    asset_id = str(args.get("asset_id") or "").strip().upper()
+    if not ASSET_ID.match(asset_id):
+        return GuardrailDecision(False, "inspect_device_requires_asset_id")
+    return GuardrailDecision(True, "asset_id_matches_expected_format")
 
 
 def _external_search_decision(args: dict[str, Any]) -> GuardrailDecision:
@@ -192,4 +211,8 @@ def evaluate_tool_call(
         return _ticket_decision(args, messages)
     if tool_name == "search_device_info":
         return _external_search_decision(args)
+    if tool_name == "lookup_user":
+        return _lookup_user_decision(args)
+    if tool_name == "inspect_device":
+        return _inspect_device_decision(args)
     return GuardrailDecision(True, "read_only_or_local_non_action_tool")
