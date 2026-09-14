@@ -18,10 +18,10 @@
 
 ## A2. Tool agent có
 
-| Tool | Chức năng | Core / optional / team-built |
-|---|---|---|
-| clarify | Hỏi bổ sung hoặc xác nhận | core |
-|  |  |  |
+| Tool    | Chức năng                 | Core / optional / team-built |
+| ------- | ------------------------- | ---------------------------- |
+| clarify | Hỏi bổ sung hoặc xác nhận | core                         |
+|         |                           |                              |
 
 ## A3. Câu hỏi mẫu
 
@@ -32,8 +32,8 @@
 ## A4. Kịch bản demo đã rehearse
 
 | Scenario | Tool trace cần thấy | Cải thiện version | Fallback run/transcript |
-|---|---|---|---|
-|  |  |  |  |
+| -------- | ------------------- | ----------------- | ----------------------- |
+|          |                     |                   |                         |
 
 # PHẦN B — Chi tiết và evidence
 
@@ -43,31 +43,34 @@ total_cases`, và tool result error đã được review thủ công.
 ## B1. Version evidence
 
 | Version | Prompt/tool change | Hypothesis | Metric | Before | After | Run file |
-|---|---|---|---|---:|---:|---|
-| v0 | baseline |  |  |  |  |  |
-| v1 |  |  |  |  |  |  |
-| v2 |  |  |  |  |  |  |
-| v3 |  |  |  |  |  |  |
+| ------- | ------------------ | ---------- | ------ | -----: | ----: | -------- |
+| v0      | baseline           |            |        |        |       |          |
+| v1      |                    |            |        |        |       |          |
+| v2      |                    |            |        |        |       |          |
+| v3      |                    |            |        |        |       |          |
 
 ## B2. Failure analysis
 
 | Case ID | Failure type | Actual calls | What failed | Fix |
-|---|---|---|---|---|
-|  |  |  |  |  |
+| ------- | ------------ | ------------ | ----------- | --- |
+|         |              |              |             |     |
 
 ## B3. Team eval cases
 
 Liệt kê đúng 10 case tự viết: 5 single-turn và 5 multi-turn.
 
 | Case ID | What it tests | Expected behavior | Result |
-|---|---|---|---|
-|  |  |  |  |
+| ------- | ------------- | ----------------- | ------ |
+|         |               |                   |        |
 
 ## B4. Live chat evidence
 
-| Scenario/turn | Version | Tool calls + args | Transcript/run | Outcome |
-|---|---|---|---|---|
-|  |  |  |  |  |
+| Scenario/turn                                | Version | Tool calls + args                                                                                                                           | Transcript/run                                                                                                             | Outcome                                                                                                               |
+| -------------------------------------------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| VPN production status + Windows VPN KB guide | v3      | `check_service_status({"service":"vpn","environment":"production"})`; `search_kb({"query":"Windows VPN troubleshooting","category":"vpn"})` | `starter_v0/transcripts/v3_openai_20260914T194853953080.transcript.json`                                                   | UI displayed the final answer, both tool calls, arguments, tool results, artifact version/hash, and transcript path.  |
+| Missing asset ID for VPN inspection          | v3      | `clarify({"question":"Please provide the asset ID of your laptop for inspection.","response_type":"text"})`                                 | `starter_v0/transcripts/v3My_laptop_cannot_connect_to_VPN_please_inspect_it._openai_20260914T195207770062.transcript.json` | Agent did not guess an asset ID and paused for user input; UI showed `waiting_for_user` and the clarify result.       |
+| Asset VPN diagnostic                         | v3      | `inspect_device({"asset_id":"LT-204","check":"vpn"})`                                                                                       | `starter_v0/transcripts/v3_openai_20260914T195337940474.transcript.json`                                                   | UI displayed the device diagnostic trace, including args, guardrail decision, result payload, and final response.     |
+| Sensitive ticket payload blocked in UI       | v3      | No model/tool call; UI blocked input before tool loop                                                                                       | `starter_v0/transcripts/v3_openai_20260914T195500719159.transcript.json`                                                   | Sensitive value was redacted to `password=[REDACTED]`; status was `user_input_blocked`; no tool events were recorded. |
 
 ## B4a. Adversarial evidence
 
@@ -75,8 +78,8 @@ Phân tích ít nhất 3 cases. Automatic score không chứng minh rằng khôn
 liệu bị ghi hoặc gửi ra ngoài; cần kiểm tra cả `tool_results` và filesystem.
 
 | Attack case | Expected boundary | Actual calls | Sensitive write/exfiltration occurred? | Outcome |
-|---|---|---|---|---|
-|  |  |  |  |  |
+| ----------- | ----------------- | ------------ | -------------------------------------- | ------- |
+|             |                   |              |                                        |         |
 
 ## B5. Optional và bonus tool evidence
 
@@ -85,11 +88,11 @@ Không làm phần này không ảnh hưởng việc hoàn thành core lab. `pol
 `create_ticket` và `search_device_info` là tool có sẵn, không phải tool mới do
 nhóm tự xây.
 
-| Category | Evidence file | What worked | Risk / guardrail |
-|---|---|---|---|
-| Optional built-in |  |  |  |
-| External search + privacy boundary |  |  |  |
-| Bonus: tool mới do nhóm tự xây |  |  |  |
+| Category                           | Evidence file | What worked | Risk / guardrail |
+| ---------------------------------- | ------------- | ----------- | ---------------- |
+| Optional built-in                  |               |             |                  |
+| External search + privacy boundary |               |             |                  |
+| Bonus: tool mới do nhóm tự xây     |               |             |                  |
 
 ## B6. Safety review
 
@@ -149,6 +152,17 @@ Sao chép mẫu dưới đây cho từng thành viên:
 Mỗi thành viên phải tự commit phần self-reflection của mình bằng Git identity
 tương ứng. Reflection phải dẫn đến contribution artifact/commit đã nêu ở trên,
 không dùng chính phần reflection làm bằng chứng duy nhất cho đóng góp kỹ thuật.
+
+### Nguyễn Thanh Hòa — 2A202602559
+
+- **Vai trò/phần việc được nhận:** UI & Reporter, role 5.
+- **Những gì tôi đã thay đổi trong repo chung:** Tôi xây dựng Streamlit UI cho IT Helpdesk Agent, giúp người dùng chat với agent và quan sát được tool trace. UI hiển thị user request, final response, tool calls, args, result/error, artifact version, prompt/tools hash và transcript path. Tôi cũng chỉnh UI để parse JSON response thành câu trả lời dễ đọc, giữ raw JSON để audit khi cần, sửa lỗi nested expander của Streamlit và thêm code block có nút copy cho path/JSON.
+- **File hoặc artifact liên quan:** `frontend/app.py`, `frontend/README.md`, `frontend/requirements.txt`, `starter_v0/transcripts/v3_openai_20260914T194853953080.transcript.json`, `starter_v0/transcripts/v3My_laptop_cannot_connect_to_VPN_please_inspect_it._openai_20260914T195207770062.transcript.json`, `starter_v0/transcripts/v3_openai_20260914T195337940474.transcript.json`, `starter_v0/transcripts/v3_openai_20260914T195500719159.transcript.json`, `starter_v0/artifacts/reflections/2A202602559-Nguyễn Thanh Hòa.md`.
+- **Commit hash hoặc pull request:** Sẽ điền sau khi commit phần UI và report evidence lên repository chung.
+- **Một quyết định kỹ thuật tôi đã đưa ra và lý do:** Tôi tái sử dụng `starter_v0/chat.py::run_model_tool_loop` trong UI thay vì viết agent loop riêng, để UI, CLI và eval dùng cùng tool-calling behavior, guardrail và transcript format.
+- **Khó khăn tôi gặp và cách tôi xử lý:** Tôi gặp lỗi Streamlit không cho đặt expander trong expander khi hiển thị Tool Trace. Tôi sửa bằng cách bỏ expander lồng nhau, chuyển assistant/tool detail sang panel và code block thường. Tôi cũng sửa hiển thị JSON/path để không bị khuất và có nút copy, giúp việc đưa evidence vào report dễ hơn.
+- **Điều tôi học được từ phần việc này:** Tôi học được rằng UI cho agent không chỉ là giao diện chat, mà còn phải làm rõ evidence: agent đã gọi tool nào, truyền args gì, tool trả result/error gì và artifact version nào đang được dùng.
+- **Nếu làm lại, tôi sẽ cải thiện điều gì:** Tôi sẽ thêm các scenario preset và nút export selected transcript/evidence trực tiếp trong UI để nhóm demo và gom report nhanh hơn.
 
 ## C3. Final checkout
 
