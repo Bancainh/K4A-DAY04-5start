@@ -398,10 +398,10 @@ Chỉ tick `[x]` sau khi kiểm tra trực tiếp trên branch nộp bài.
 - [x] Mỗi thành viên có ít nhất một commit trong lịch sử branch nộp bài.
 - [x] Phần reflection chung của nhóm đã được soạn trong report.
 - [x] Mỗi thành viên đã tự viết và commit self-reflection của mình.
-- [ ] `system_prompt.md`, `tools.yaml`, valid version log, selected runs, 10-case group eval, required transcripts, UI và final report đều đã có trên final branch.
+- [x] `system_prompt.md`, `tools.yaml`, valid version log, selected runs, 10-case group eval, required transcripts, UI và final report đều đã có trên final branch.
 - [x] v0–v3 official runs đều có `provider_error_cases == 0` và `measured_cases == total_cases`.
 - [x] Final adversarial rerun đã dùng đúng final artifact hash và được manual review.
-- [ ] Không có `.env`, API key, token, dữ liệu thật, cache hoặc generated ticket bị commit.
+- [x] Không có `.env`, API key, token, dữ liệu thật, cache hoặc generated ticket bị commit.
 - [x] Repository chung đã thống nhất: `https://github.com/Bancainh/K4A-DAY04-5start`.
 - [x] Nhóm trưởng và mọi thành viên xác nhận sẽ nộp cùng URL trên VLearn.
 
