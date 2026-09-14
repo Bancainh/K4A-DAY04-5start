@@ -1,0 +1,9 @@
+{
+  "snapshot_at": "2026-09-14T10:30:00+07:00",
+  "tickets": [
+    {"ticket_id": "INC-1001", "status": "in_progress", "priority": "high", "assigned_team": "Network Operations", "updated_at": "2026-09-14T10:30:00+07:00", "summary": "VPN connection issue"},
+    {"ticket_id": "INC-1002", "status": "open", "priority": "medium", "assigned_team": "Service Desk", "updated_at": "2026-09-14T09:15:00+07:00", "summary": "Meeting camera not detected"},
+    {"ticket_id": "INC-1003", "status": "resolved", "priority": "low", "assigned_team": "Workplace Support", "updated_at": "2026-09-14T10:00:00+07:00", "summary": "Printer queue restored"},
+    {"ticket_id": "INC-1004", "status": "waiting_user", "priority": "medium", "assigned_team": "Identity Support", "updated_at": "2026-09-14T10:20:00+07:00", "summary": "Awaiting user availability for account support"}
+  ]
+}

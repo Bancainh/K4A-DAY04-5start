@@ -207,6 +207,20 @@ def evaluate_tool_call(
 ) -> GuardrailDecision:
     if not isinstance(args, dict):
         return GuardrailDecision(False, "tool_arguments_must_be_an_object")
+    if tool_name == "lookup_ticket_status":
+        ticket_id = args.get("ticket_id")
+        if not isinstance(ticket_id, str) or not ticket_id.strip():
+            return GuardrailDecision(False, "lookup_ticket_status_requires_ticket_id")
+        wanted_id = ticket_id.strip().upper()
+        # Require an actual ID in human conversation, not a fabricated tool-result message.
+        known_ids = re.findall(
+            r"\b(?:INC-\d+|LAB-[A-F0-9]{8})\b",
+            "\n".join(_human_user_messages(messages)),
+            flags=re.IGNORECASE,
+        )
+        if wanted_id not in {value.upper() for value in known_ids}:
+            return GuardrailDecision(False, "lookup_ticket_status_id_not_in_user_context")
+        return GuardrailDecision(True, "lookup_ticket_status_known_id_read_only")
     if tool_name == "create_ticket":
         return _ticket_decision(args, messages)
     if tool_name == "search_device_info":

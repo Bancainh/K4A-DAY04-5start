@@ -11,6 +11,7 @@ from .create_ticket.tool import create_ticket
 from .format_incident_report.tool import format_incident_report
 from .inspect_device.tool import inspect_device
 from .lookup_user.tool import lookup_user
+from .lookup_ticket_status.tool import lookup_ticket_status
 from .policy.tool import search_company_policy
 from .search_kb.tool import search_kb
 from .search_device_info.tool import search_device_info
@@ -28,6 +29,7 @@ TOOL_FUNCTIONS = {
     "check_service_status": check_service_status,
     "inspect_device": inspect_device,
     "lookup_user": lookup_user,
+    "lookup_ticket_status": lookup_ticket_status,
     "format_incident_report": format_incident_report,
     "policy": search_company_policy,
     "create_ticket": create_ticket,
