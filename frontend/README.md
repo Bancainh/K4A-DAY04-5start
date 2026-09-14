@@ -14,10 +14,22 @@ Day 04 Lab yeu cau xay dung va cai thien IT Helpdesk Agent. Agent can biet chon 
 
 ## Chay
 
+Nen chay trong virtual environment rieng de tranh xung dot dependency voi cac project Python khac.
+
 ```powershell
-cd D:\Sourcecode\vinai\lab\lab4\K4A-DAY04-5start\frontend
+cd path\to\K4A-DAY04-5start\frontend
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
 python -m pip install -r requirements.txt
 streamlit run app.py
 ```
 
 UI dung lai `starter_v0/chat.py::run_model_tool_loop`, vi vay hanh vi chat giong CLI/eval loop cua lab.
+
+## Safety parity voi CLI
+
+UI chan input co password, token, API key, MFA/OTP hoac recovery code truoc khi goi model. Luot bi chan van duoc ghi vao transcript voi gia tri nhay cam da redact.
+
+## Luu y khi nop bai
+
+Khong commit `.env`, API key, `.venv`, cache, generated tickets hoac transcript co du lieu that.
