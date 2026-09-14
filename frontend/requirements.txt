@@ -1,0 +1,2 @@
+-r ../starter_v0/requirements.txt
+streamlit>=1.30.0
