@@ -4,7 +4,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from providers.base import Provider, ToolCall
-from tools import TOOL_FUNCTIONS
+from tool_runtime import execute_tool_call
 
 
 @dataclass
@@ -39,13 +39,5 @@ class HelpdeskAgent:
         )
         results: list[dict[str, Any]] = []
         for call in response.tool_calls:
-            func = TOOL_FUNCTIONS.get(call.name)
-            if not func:
-                results.append({"tool": call.name, "error": "unknown_tool"})
-                continue
-            try:
-                result = func(**call.args)
-            except Exception as exc:  # keep eval robust; failures are evidence
-                result = {"error": type(exc).__name__, "message": str(exc)}
-            results.append({"tool": call.name, "args": call.args, "result": result})
+            results.append(execute_tool_call(call, messages=messages))
         return AgentRun(text=response.text, tool_calls=response.tool_calls, tool_results=results)
