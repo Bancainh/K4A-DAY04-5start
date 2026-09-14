@@ -6,9 +6,9 @@
 
 - **File hoặc artifact liên quan:** `TEAMMATES.md`, `starter_v0/artifacts/version_log.csv`, `starter_v0/artifacts/REPORT.md`, các run trong `starter_v0/runs/`, cùng các artifact/evidence được tích hợp trên branch `main`.
 
-- **Commit hash hoặc pull request:** `<điền commit hoặc PR thật của bạn>`
+- **Commit hash hoặc pull request:** `dfbbaaf` — Merge pull request #2 (`tool-declaration-tramanh`) vào branch `main`.
 
-- **Một quyết định kỹ thuật tôi đã đưa ra và lý do:** Tôi quyết định chỉ sử dụng các evaluation run có `provider_error_cases == 0` và `measured_cases == total_cases` làm evidence chính thức. Điều này giúp tránh việc đưa các metric không hợp lệ do lỗi quota hoặc provider vào version comparison và report cuối.
+- **Một quyết định kỹ thuật tôi đã đưa ra và lý do:** Trong quá trình final integration, tôi áp dụng tiêu chí chỉ sử dụng các evaluation run có `provider_error_cases == 0` và `measured_cases == total_cases` làm evidence chính thức. Tôi cũng kiểm tra artifact hash của run để xác nhận evaluation thực sự sử dụng đúng version của prompt/tool được khai báo. Điều này giúp tránh sử dụng các metric không hợp lệ do quota hoặc provider failure và đảm bảo kết quả có thể truy vết lại được.
 
 - **Khó khăn tôi gặp và cách tôi xử lý:** Khó khăn lớn nhất là các thành viên làm những phần khác nhau và một số artifact ban đầu chưa đồng bộ, ví dụ version log tham chiếu tới các run không hợp lệ hoặc chưa có trong repository. Tôi xử lý bằng cách pull bản mới nhất, kiểm tra từng deliverable, đối chiếu hash/version của prompt với run và kiểm tra lại evidence trước khi final integration.
 
