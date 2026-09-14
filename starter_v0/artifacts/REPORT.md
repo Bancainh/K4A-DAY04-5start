@@ -164,6 +164,17 @@ không dùng chính phần reflection làm bằng chứng duy nhất cho đóng 
 - **Điều tôi học được từ phần việc này:** Tôi học được rằng UI cho agent không chỉ là giao diện chat, mà còn phải làm rõ evidence: agent đã gọi tool nào, truyền args gì, tool trả result/error gì và artifact version nào đang được dùng.
 - **Nếu làm lại, tôi sẽ cải thiện điều gì:** Tôi sẽ thêm các scenario preset và nút export selected transcript/evidence trực tiếp trong UI để nhóm demo và gom report nhanh hơn.
 
+### Trần Anh Vũ — 2A202602570
+
+- **Vai trò/phần việc được nhận:** Prompt Engineer; thiết kế và tối ưu system prompt, hướng dẫn định tuyến tool, quy ước arguments, xử lý thiếu thông tin, hội thoại nhiều lượt và ranh giới xác nhận.
+- **Những gì tôi đã thay đổi trong repo chung:** Phân tích fixed eval và adversarial traces để xây dựng các phiên bản prompt v0-v3; bổ sung hướng dẫn phân biệt service status, device inspection, KB, policy và public search; chuẩn hóa intent/action/evidence; đồng thời ghi hypothesis, hash artifact, metric và run file vào version log.
+- **File hoặc artifact liên quan:** `starter_v0/artifacts/system_prompt.md`, `starter_v0/artifacts/tools.yaml`, `starter_v0/artifacts/versions/`, `starter_v0/artifacts/version_log.csv`, `starter_v0/artifacts/run-analysis.csv`, và `starter_v0/runs/`.
+- **Commit hash hoặc pull request:** `dae2c2e8d8d7f5add9e453fd4c34dfbb9318ae8f`
+- **Một quyết định kỹ thuật tôi đã đưa ra và lý do:** Tách từng vòng cải tiến theo một hypothesis cụ thể: trước tiên sửa routing và arguments trong prompt, sau đó bổ sung safety boundary và cuối cùng chuẩn hóa output contract. Cách này giúp đối chiếu thay đổi prompt/tools với metric và run tương ứng thay vì chỉ đánh giá cảm tính.
+- **Khó khăn tôi gặp và cách tôi xử lý:** Model nhiều lần chọn sai tool hoặc gọi thiếu tool trong các yêu cầu cần nhiều nguồn. Tôi lập bảng route theo loại yêu cầu, yêu cầu giữ nguyên enum và identifier, đồng thời hướng dẫn dùng intent mới nhất khi người dùng sửa hoặc hủy yêu cầu. Với ticket, tôi quy định confirmation phải gắn với payload hiện tại và mất hiệu lực khi payload thay đổi.
+- **Điều tôi học được từ phần việc này:** Prompt cần mô tả rõ cả khi nào nên gọi tool và khi nào không nên gọi tool. Metric cũng chỉ có giá trị khi đủ số case đo được và không có provider error; vì vậy cần đọc cả tool calls, tool results và run metadata thay vì chỉ nhìn accuracy.
+- **Nếu làm lại, tôi sẽ cải thiện điều gì:** Tôi sẽ chuẩn hóa snapshot prompt và `tools.yaml` ngay từ vòng baseline, thiết kế version log trước khi chạy eval, và dành riêng một vòng kiểm thử ổn định provider để tránh quota hoặc provider error làm mất giá trị so sánh giữa các phiên bản.
+
 ## C3. Final checkout
 
 Chỉ nộp bài khi mọi mục dưới đây đã được kiểm tra trên branch cuối cùng của
