@@ -10,7 +10,9 @@ from typing import Any
 from env_loader import load_lab_env
 from providers import make_provider
 from providers.base import ToolCall
-from tools import TOOL_FUNCTIONS, load_tool_declarations, to_openai_tools
+from redaction import contains_sensitive_data, sanitize_for_logging
+from tool_runtime import execute_tool_call
+from tools import load_tool_declarations, to_openai_tools
 from versioning import artifact_version_dict, build_artifact_version
 
 
@@ -41,21 +43,6 @@ def trim_history(history: list[dict[str, str]], window: int) -> list[dict[str, s
     return history[-window * 2:]
 
 
-def execute_tool_call(call: ToolCall) -> dict[str, Any]:
-    func = TOOL_FUNCTIONS.get(call.name)
-    if not func:
-        return {
-            "tool": call.name,
-            "args": call.args,
-            "result": {"error": "unknown_tool", "message": f"No local implementation for {call.name}"},
-        }
-    try:
-        result = func(**call.args)
-    except Exception as exc:
-        result = {"error": type(exc).__name__, "message": str(exc)}
-    return {"tool": call.name, "args": call.args, "result": result}
-
-
 def tool_results_message(events: list[dict[str, Any]]) -> dict[str, str]:
     return {
         "role": "user",
@@ -69,8 +56,8 @@ def tool_results_message(events: list[dict[str, Any]]) -> dict[str, str]:
 
 
 def assistant_tool_message(response_text: str | None, calls: list[ToolCall]) -> dict[str, str]:
-    call_summary = [{"name": call.name, "args": call.args} for call in calls]
-    content = response_text or "I will call the selected tool(s)."
+    call_summary = sanitize_for_logging([{"name": call.name, "args": call.args} for call in calls])
+    content = sanitize_for_logging(response_text or "I will call the selected tool(s).")
     return {
         "role": "assistant",
         "content": f"{content}\n\nTOOL_CALLS_JSON:\n{json_text(call_summary)}",
@@ -92,10 +79,11 @@ def run_model_tool_loop(
     for round_index in range(1, max_tool_rounds + 1):
         response = provider.complete(working_messages, tools, model=model, temperature=0.0)
         calls = response.tool_calls
+        safe_response_text = sanitize_for_logging(response.text or "")
         round_record: dict[str, Any] = {
             "round": round_index,
-            "assistant_text": response.text,
-            "tool_calls": [{"name": call.name, "args": call.args} for call in calls],
+            "assistant_text": safe_response_text,
+            "tool_calls": sanitize_for_logging([{"name": call.name, "args": call.args} for call in calls]),
             "tool_results": [],
         }
 
@@ -103,7 +91,7 @@ def run_model_tool_loop(
             rounds.append(round_record)
             return {
                 "status": "answered",
-                "assistant_text": response.text or "",
+                "assistant_text": safe_response_text,
                 "rounds": rounds,
                 "tool_events": all_tool_events,
             }
@@ -112,8 +100,9 @@ def run_model_tool_loop(
         non_clarification_events: list[dict[str, Any]] = []
 
         for call in calls:
-            print(f"[tool] {call.name}({json.dumps(call.args, ensure_ascii=True, sort_keys=True)})")
-            event = execute_tool_call(call)
+            safe_args = sanitize_for_logging(call.args)
+            print(f"[tool] {call.name}({json.dumps(safe_args, ensure_ascii=True, sort_keys=True)})")
+            event = execute_tool_call(call, messages=working_messages)
             round_record["tool_results"].append(event)
             all_tool_events.append(event)
 
@@ -146,7 +135,8 @@ def run_model_tool_loop(
 def write_transcript(path: Path, transcript: dict[str, Any]) -> None:
     transcript["updated_at"] = now_iso()
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(transcript, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
+    safe_transcript = sanitize_for_logging(transcript)
+    path.write_text(json.dumps(safe_transcript, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
 
 
 def main() -> None:
@@ -216,12 +206,28 @@ def main() -> None:
         turn_record: dict[str, Any] = {
             "turn_index": turn_index,
             "started_at": now_iso(),
-            "user": user_text,
+            "user": sanitize_for_logging(user_text),
             "status": "started",
             "assistant_text": None,
             "rounds": [],
             "tool_events": [],
         }
+
+        if contains_sensitive_data(user_text):
+            assistant_text = (
+                "I cannot process or store passwords, tokens, API keys, MFA/OTP values, or recovery codes. "
+                "Remove the sensitive value and describe only the technical symptom."
+            )
+            turn_record.update({
+                "status": "user_input_blocked",
+                "assistant_text": assistant_text,
+                "ended_at": now_iso(),
+            })
+            transcript["turns"].append(turn_record)
+            write_transcript(transcript_path, transcript)
+            print(f"\nAgent> {assistant_text}")
+            print(f"Transcript saved: {transcript_path}")
+            continue
 
         try:
             result = run_model_tool_loop(

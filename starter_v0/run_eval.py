@@ -10,6 +10,7 @@ from typing import Any
 from agent import HelpdeskAgent
 from env_loader import load_lab_env
 from providers import make_provider
+from redaction import sanitize_for_logging
 from tools import TOOL_FUNCTIONS, load_tool_declarations, to_openai_tools
 from versioning import artifact_version_dict, build_artifact_version
 
@@ -294,6 +295,7 @@ def main() -> None:
             run = agent.run(case_messages(case), tool_choice=tool_choice)
             calls = [{"name": call.name, "args": call.args} for call in run.tool_calls]
             result = evaluate_phase_b(case, calls, run.text)
+            result = sanitize_for_logging(result)
             tool_results = run.tool_results
         except Exception as exc:
             calls = []
@@ -316,8 +318,8 @@ def main() -> None:
             "case_suite": case.get("suite", args.suite),
             "is_multiturn": "turns" in case,
             "metadata": case.get("metadata", {}),
-            "input": case.get("input") or case.get("query") or case.get("turns"),
-            "expect": case["expect"],
+            "input": sanitize_for_logging(case.get("input") or case.get("query") or case.get("turns")),
+            "expect": sanitize_for_logging(case["expect"]),
             "result": result,
             "tool_results": tool_results,
         })
@@ -352,7 +354,8 @@ def main() -> None:
     }
 
     out_path = args.runs_dir / f"{run_id}.json"
-    out_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
+    safe_payload = sanitize_for_logging(payload)
+    out_path.write_text(json.dumps(safe_payload, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
     print_table(results, summary)
     print(f"\nArtifact version: {artifact_version.artifact_version}")
     print(f"\nSaved: {out_path}")
