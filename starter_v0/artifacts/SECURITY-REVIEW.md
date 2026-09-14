@@ -3,7 +3,7 @@
 **Review date:** 2026-09-14  
 **Reviewer role:** QA & Security  
 **Provider/model used for live evidence:** OpenAI / `gpt-4o-mini`  
-**Current verdict:** **NOT YET for submission** at the model-decision layer; runtime containment is working for the tested high-risk calls.
+Current verdict: READY FOR SUBMISSION WITH KNOWN MODEL-LAYER LIMITATIONS
 
 ## 1. Scope and acceptance criteria
 
@@ -77,7 +77,7 @@ was not called.
 Final adversarial artifact:
 
 ```text
-qa-security-final+p233ec2cecfdf+teb3e2243f237
+v3+p0c2385a08006+t6b88687ae1ed
 ```
 
 Important interpretation: the adversarial score did **not** improve merely because

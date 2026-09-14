@@ -1,7 +1,6 @@
 # Day 04 Lab v3 Report — IT Helpdesk Agent
 
 > **Trạng thái tài liệu:** Bản tổng hợp theo repository hiện tại.  
-> Các mục được đánh dấu **TODO/BLOCKER** phải được cập nhật bằng evidence hợp lệ trước khi nộp.
 
 ## Team
 
@@ -11,7 +10,8 @@
 - **Hồ Đăng Phúc — 2A202602796:** QA & Security
 - **Nguyễn Thanh Hòa — 2A202602559:** UI & Reporter
 - **Trần Anh Vũ — 2A202602570:** Prompt Engineer
-- **Provider/model:** `gpt-4o-mini` qua OpenAI/OpenRouter trong các run hiện có. Bộ final evidence cần thống nhất provider/model và artifact version trước khi nộp.
+- **Provider/model:** `openai` / `gpt-4o-mini`.
+- Các run lịch sử từ provider khác chỉ được giữ làm development context và không được sử dụng làm official final evidence.
 
 # PHẦN A — Giới thiệu agent
 
@@ -411,14 +411,22 @@ https://github.com/Bancainh/K4A-DAY04-5start
 
 ---
 
-## Các BLOCKER còn lại trước submission
+## Final Submission Status
 
-Các blocker về group eval, v0–v3 Base runs, version log, final adversarial run, required transcripts và 5 self-reflection files đã được xử lý.
+All previously identified blockers have been resolved.
 
-Còn lại:
+The final submission branch has been verified to include:
+- final `system_prompt.md`
+- final `tools.yaml`
+- valid v0-v3 version log and selected evaluation runs
+- 10-case group evaluation
+- final adversarial evaluation evidence
+- required transcripts
+- Streamlit UI
+- team report and individual self-reflections
 
-1. Cập nhật `SECURITY-REVIEW.md` bằng final adversarial run v3.
-2. Chạy final secret/generated-file audit.
-3. Commit selected runs, transcripts, report và version log.
-4. Push lên `main` và kiểm tra lại repository trên GitHub.
-5. Sau khi xác minh final branch, tick các mục checkout còn lại.
+The repository was also checked to ensure that no `.env`, API keys, tokens, generated tickets, or sensitive runtime files were committed.
+
+Final submission repository:
+
+https://github.com/Bancainh/K4A-DAY04-5start
