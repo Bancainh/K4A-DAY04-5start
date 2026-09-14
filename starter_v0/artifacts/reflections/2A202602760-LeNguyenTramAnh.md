@@ -1,0 +1,9 @@
+# Individual Reflection
+
+- Họ và tên: Lê Nguyễn Trâm Anh
+- MSSV: 2A202602760
+- Vai trò: Tool Declarator & Developer
+
+Trong Lab Day 04, tôi phụ trách Tool Declarator & Developer, tập trung vào artifacts/tools.yaml. Tôi audit 9 tools, đối chiếu declaration với implementation và TOOL.md để kiểm tra chức năng, parameter và boundary. Ban đầu, tôi nghĩ description chỉ cần mô tả tool làm gì. Khi baseline v0 đạt 21/30 cases, tôi nhận ra model còn cần biết khi nào dùng tool và chọn argument nào. Tôi làm rõ sự khác nhau giữa lookup_user, inspect_device, check_service_status và search_kb, cùng các boundary về confirmation, privacy và untrusted content. Tôi chỉ chỉnh description, giữ nguyên schema và không thay đổi implementation. Run v1 đạt 29/30; tool_routing_accuracy tăng từ 0.7667 lên 1.0, argument_accuracy từ 0.70 lên 0.9667 và multiturn_accuracy từ 0.80 lên 1.0. Đây là evidence cho hướng cải thiện declaration, nhưng một run chưa đủ để khẳng định kết quả luôn lặp lại.
+
+Tôi thử refinement cho inspect_device.check vì H17 chọn all thay vì vpn. Thay đổi giúp H17 pass, nhưng H02 lại gọi thêm các tool kiểm tra dịch vụ không cần thiết. Regression này khiến tôi hiểu rằng sửa được một case chưa có nghĩa agent tốt hơn. Tôi chọn giữ v1 stable thay vì tiếp tục điều chỉnh chỉ để đạt 30/30 và có nguy cơ overfit evaluator. Tôi cũng thực hành Git branch, commit, push và Pull Request để phần việc được review trong repo chung. Điều tôi học được là hypothesis-driven, evidence-based iteration: đo baseline, đọc failure, đặt giả thuyết, chỉnh tối thiểu rồi kiểm tra toàn suite. Nếu làm lại, tôi sẽ ghi hypothesis và version rõ hơn từ đầu, kiểm tra cả case mục tiêu lẫn các case đang pass, và chạy lặp lại khi có điều kiện để phân biệt cải thiện thực sự với biến động của model. Tôi cũng cần đọc actual tool calls kỹ hơn, thay vì chỉ nhìn tổng điểm.
