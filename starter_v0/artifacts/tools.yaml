@@ -42,7 +42,7 @@ tools:
       type: object
       properties:
         asset_id: {type: string, description: "Một asset ID đã biết từ hội thoại hoặc kết quả lookup_user thực; dùng ID được sửa mới nhất, không đoán từ employee ID hoặc model. Nếu thiếu, hỏi clarify"}
-        check: {type: string, enum: [all, network, vpn, security, hardware, software], default: "all", description: "Chọn nhóm theo triệu chứng hoặc domain được nêu: network cho Wi-Fi/kết nối mạng, vpn cho VPN/certificate VPN, security/hardware/software cho nhóm tương ứng; all khi yêu cầu kiểm tra tổng quát và không nêu triệu chứng/domain cụ thể."}
+        check: {type: string, enum: [all, network, vpn, security, hardware, software], default: "all", description: "Nhóm snapshot cần đọc: network cho Wi-Fi/kết nối mạng, vpn cho VPN, security/hardware/software cho nhóm tương ứng; all khi yêu cầu kiểm tra tổng quát"}
       required: [asset_id]
 
   - name: lookup_user
