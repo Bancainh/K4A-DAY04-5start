@@ -21,6 +21,7 @@
 | Tool    | Chức năng                 | Core / optional / team-built |
 | ------- | ------------------------- | ---------------------------- |
 | clarify | Hỏi bổ sung hoặc xác nhận | core                         |
+| lookup_ticket_status | Tra cứu trạng thái ticket đã tồn tại theo `ticket_id` | Team-built / Bonus |
 |         |                           |                              |
 
 ## A3. Câu hỏi mẫu
@@ -48,6 +49,21 @@ total_cases`, và tool result error đã được review thủ công.
 | v1      |                    |            |        |        |       |          |
 | v2      |                    |            |        |        |       |          |
 | v3      |                    |            |        |        |       |          |
+
+**Evidence Tool Declarator — Lê Nguyễn Trâm Anh (2A202602760):** Baseline v0
+đạt 21/30; sau khi audit 9 tool declarations và làm rõ routing, required
+arguments cùng các tool boundary, v1 đạt 29/30. Các metric tương ứng:
+`tool_routing_accuracy` 0.7667 → 1.0, `argument_accuracy` 0.70 → 0.9667 và
+`multiturn_accuracy` 0.80 → 1.0. Refinement cho `inspect_device.check` giúp
+H17 pass nhưng gây regression ở H02, vì vậy phiên bản này được rollback về v1
+stable thay vì tiếp tục overfit evaluator. Evidence:
+`starter_v0/runs/v0_B_base_openrouter_20260914T181651545147.json`,
+`starter_v0/runs/v1_B_base_openrouter_20260914T182755697001.json` và
+`starter_v0/runs/v2_B_base_openrouter_20260914T183220973225.json`.
+
+Bonus Base OpenRouter đạt 28/30, đo đủ 30/30 case và có
+`provider_error_cases = 0`; evidence tại
+`starter_v0/runs/bonus-ticket-status_B_base_openrouter_20260914T203546678522.json`.
 
 ## B2. Failure analysis
 
@@ -92,7 +108,7 @@ nhóm tự xây.
 | ---------------------------------- | ------------- | ----------- | ---------------- |
 | Optional built-in                  |               |             |                  |
 | External search + privacy boundary |               |             |                  |
-| Bonus: tool mới do nhóm tự xây     |               |             |                  |
+| Bonus: `lookup_ticket_status` (team-built) | `starter_v0/tools/lookup_ticket_status/TOOL.md`; `starter_v0/artifacts/evidence/bonus/lookup_ticket_status-smoke.json`; `starter_v0/transcripts/bonus-ticket-status_openrouter_20260914T203823634213.transcript.json`; `starter_v0/runs/bonus-ticket-status_B_base_openrouter_20260914T203546678522.json`; `starter_v0/guardrails.py` | Tra cứu ticket đã tồn tại theo `ticket_id`; `compileall` PASS; 10 bonus smoke + 30 security tests = 40/40 PASS. Base OpenRouter đo đủ 30/30 case, đạt 28/30 và không có provider error; manual routing 3/3 đúng. Run này không ghi nhận regression nghiêm trọng, không được dùng để kết luận bonus tool làm tăng accuracy. | Read-only, không create/update/close, không gọi external service và không cần confirmation. Thiếu `ticket_id` thì clarify, không tự đoán ID; guardrail giữ lookup tách biệt với write action `create_ticket`, và dữ liệu ticket được coi là untrusted data. |
 
 ## B6. Safety review
 
@@ -152,6 +168,19 @@ Sao chép mẫu dưới đây cho từng thành viên:
 Mỗi thành viên phải tự commit phần self-reflection của mình bằng Git identity
 tương ứng. Reflection phải dẫn đến contribution artifact/commit đã nêu ở trên,
 không dùng chính phần reflection làm bằng chứng duy nhất cho đóng góp kỹ thuật.
+
+### Lê Nguyễn Trâm Anh — 2A202602760
+
+- **Vai trò/phần việc được nhận:** Tool Declarator & Developer, chịu trách nhiệm chính cho tool contract, tool boundary và evidence liên quan đến `starter_v0/artifacts/tools.yaml`.
+- **Core contribution:** Tôi audit toàn bộ 9 tool declarations và đối chiếu từng declaration với implementation cùng `TOOL.md`. Tôi làm rõ khi nào dùng hoặc không dùng tool, các required arguments, boundary giữa `lookup_user`, `inspect_device`, `check_service_status` và `search_kb`, confirmation boundary của `create_ticket`, privacy boundary của `search_device_info`, đồng thời quy định retrieved content là untrusted data. Ở vòng core, tôi chủ yếu chỉnh declaration/description và không sửa implementation để có thể đo riêng tác động của tool contract.
+- **Evidence:** Baseline v0 đạt 21/30. Sau refinement declaration, v1 đạt 29/30; `tool_routing_accuracy` tăng từ 0.7667 lên 1.0, `argument_accuracy` từ 0.70 lên 0.9667 và `multiturn_accuracy` từ 0.80 lên 1.0. Evidence đối chiếu gồm `starter_v0/artifacts/versions/tools_v0.yaml`, `starter_v0/artifacts/versions/tools_v1.yaml`, `starter_v0/runs/v0_B_base_openrouter_20260914T181651545147.json` và `starter_v0/runs/v1_B_base_openrouter_20260914T182755697001.json`.
+- **Bonus capability:** Tôi xây dựng `lookup_ticket_status` để tra cứu trạng thái ticket đã tồn tại theo `ticket_id`, gồm declaration, implementation, registry, mock data, guardrail, smoke test, bonus eval và transcript evidence. Tool chỉ đọc dữ liệu local, không create/update/close ticket, không cần confirmation, không gọi external service, không tự đoán `ticket_id`; nếu thiếu ID thì agent phải clarification. Boundary này tách rõ lookup khỏi write flow của `create_ticket`. Các file chính: `starter_v0/tools/lookup_ticket_status/TOOL.md`, `starter_v0/tools/lookup_ticket_status/tool.py`, `starter_v0/tools/lookup_ticket_status/__init__.py`, `starter_v0/tools/__init__.py`, `starter_v0/artifacts/tools.yaml`, `starter_v0/helpdesk_data/ticket_status.json`, `starter_v0/qa/test_lookup_ticket_status.py`, `starter_v0/data/eval_bonus_ticket_status.json` và `starter_v0/guardrails.py`.
+- **Validation:** `compileall` PASS; 10 bonus smoke tests và 30 security tests đạt 40/40 PASS. Base OpenRouter bonus run có `total_cases = 30`, `measured_cases = 30`, `provider_error_cases = 0`, đạt 28/30 (`case_accuracy = 0.9333`, `tool_routing_accuracy = 0.9667`, `argument_accuracy = 0.9333`, `multiturn_accuracy = 1.0`). Manual routing xác nhận ba boundary: ID `INC-1001` gọi đúng lookup và trả `in_progress`/`high`/`Network Operations`; yêu cầu không có ID dẫn đến clarification; yêu cầu tạo ticket mới không gọi lookup và vẫn theo `create_ticket` flow. Evidence: `starter_v0/artifacts/evidence/bonus/lookup_ticket_status-smoke.json`, `starter_v0/runs/bonus-ticket-status_B_base_openrouter_20260914T203546678522.json` và `starter_v0/transcripts/bonus-ticket-status_openrouter_20260914T203823634213.transcript.json`. Kết quả này chỉ cho thấy run bonus không có provider error và không quan sát thấy regression nghiêm trọng; không chứng minh bonus tool làm tăng accuracy.
+- **Một quyết định kỹ thuật tôi đã đưa ra và lý do:** Tôi tách read-only lookup khỏi write action `create_ticket` và chạy full-suite regression sau khi thêm tool. Trong core, refinement cho `inspect_device.check` giúp H17 pass nhưng tạo regression ở H02; tôi quyết định rollback về v1 stable thay vì tiếp tục tối ưu cho một case và overfit evaluator.
+- **Khó khăn tôi gặp và cách tôi xử lý:** Khó khăn chính là description đủ cụ thể để model phân biệt các tool gần nhau nhưng không quá hẹp theo từng case kiểm thử. Tôi xử lý bằng cách đối chiếu declaration với code và `TOOL.md`, thay đổi tối thiểu, đọc actual tool calls, rồi kiểm tra lại toàn suite thay vì chỉ nhìn tổng điểm hoặc riêng case H17.
+- **Điều tôi học được từ phần việc này:** Tool declaration cũng là một phần của prompt và phải được kiểm thử như code. Một thay đổi nhỏ ở contract có thể sửa case mục tiêu nhưng làm hỏng routing ở case khác, nên mọi refinement cần hypothesis rõ ràng, evidence theo version và regression test.
+- **Nếu làm lại, tôi sẽ cải thiện điều gì:** Tôi sẽ chuẩn hóa versioning từ đầu, snapshot `tools.yaml` kèm evidence hash cho mỗi vòng, ghi trước hypothesis và acceptance criteria, rồi chạy lặp lại cả case mục tiêu lẫn các case đang pass để phân biệt cải thiện ổn định với biến động của model.
+- **Reflection file:** `artifacts/reflections/2A202602760-LeNguyenTramAnh.md`.
 
 ### Nguyễn Thanh Hòa — 2A202602559
 
