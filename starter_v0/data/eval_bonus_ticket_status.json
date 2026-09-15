@@ -1,0 +1,31 @@
+{
+  "dataset_id": "day04_bonus_ticket_status",
+  "dataset_role": "extension",
+  "description": "Separate bonus suite; does not replace or expand the 10-case group suite.",
+  "cases": [
+    {
+      "id": "T01_existing_ticket_status",
+      "phase": "B",
+      "suite": "extension",
+      "query": "Kiểm tra giúp tôi ticket INC-1001 đang ở trạng thái nào.",
+      "failure_type": "wrong_tool",
+      "expect": {"tool_calls": [{"name": "lookup_ticket_status", "args": {"ticket_id": "INC-1001"}}]}
+    },
+    {
+      "id": "T02_missing_ticket_id",
+      "phase": "B",
+      "suite": "extension",
+      "query": "Ticket của tôi đang sao rồi?",
+      "failure_type": "missing_info",
+      "expect": {"tool_calls": [{"name": "clarify", "args": {"response_type": "text"}}]}
+    },
+    {
+      "id": "T03_unknown_ticket_status",
+      "phase": "B",
+      "suite": "extension",
+      "query": "Tra trạng thái ticket INC-9999 giúp tôi.",
+      "failure_type": "wrong_tool",
+      "expect": {"tool_calls": [{"name": "lookup_ticket_status", "args": {"ticket_id": "INC-9999"}}]}
+    }
+  ]
+}
