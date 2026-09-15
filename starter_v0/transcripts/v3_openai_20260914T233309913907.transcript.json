@@ -1,0 +1,82 @@
+{
+  "transcript_id": "v3_openai_20260914T233309913907",
+  "version": "v3",
+  "artifact_version": "v3+p0c2385a08006+t6b88687ae1ed",
+  "prompt_hash": "0c2385a08006a795f2480507eb8a42e12d67663e6849d6b913197f03cf780eaa",
+  "tools_hash": "6b88687ae1ed56ffc30bf809d37b937e1fdb93fd1e3f7e3c2fa21f009dcf301a",
+  "provider": "openai",
+  "model": "gpt-4o-mini",
+  "system_prompt": "artifacts\\versions\\system_prompt_v3.md",
+  "tools": "artifacts\\versions\\tools_v3.yaml",
+  "history_window": 5,
+  "max_tool_rounds": 4,
+  "created_at": "2026-09-14T23:33:09",
+  "updated_at": "2026-09-14T23:33:26",
+  "turns": [
+    {
+      "turn_index": 1,
+      "started_at": "2026-09-14T23:33:17",
+      "user": "Please inspect my laptop for VPN issues.",
+      "status": "waiting_for_user",
+      "assistant_text": "Please provide your laptop's asset ID to proceed with the inspection for VPN issues.",
+      "rounds": [
+        {
+          "round": 1,
+          "assistant_text": "",
+          "tool_calls": [
+            {
+              "name": "clarify",
+              "args": {
+                "question": "Please provide your laptop's asset ID to proceed with the inspection for VPN issues.",
+                "response_type": "text"
+              }
+            }
+          ],
+          "tool_results": [
+            {
+              "tool": "clarify",
+              "args": {
+                "question": "Please provide your laptop's asset ID to proceed with the inspection for VPN issues.",
+                "response_type": "text"
+              },
+              "guardrail": {
+                "allowed": true,
+                "reason": "read_only_or_local_non_action_tool",
+                "rule": "helpdesk_tool_guardrail_v2"
+              },
+              "result": {
+                "tool": "clarify",
+                "question": "Please provide your laptop's asset ID to proceed with the inspection for VPN issues.",
+                "response_type": "text",
+                "options": [],
+                "awaiting_user": true
+              }
+            }
+          ]
+        }
+      ],
+      "tool_events": [
+        {
+          "tool": "clarify",
+          "args": {
+            "question": "Please provide your laptop's asset ID to proceed with the inspection for VPN issues.",
+            "response_type": "text"
+          },
+          "guardrail": {
+            "allowed": true,
+            "reason": "read_only_or_local_non_action_tool",
+            "rule": "helpdesk_tool_guardrail_v2"
+          },
+          "result": {
+            "tool": "clarify",
+            "question": "Please provide your laptop's asset ID to proceed with the inspection for VPN issues.",
+            "response_type": "text",
+            "options": [],
+            "awaiting_user": true
+          }
+        }
+      ],
+      "ended_at": "2026-09-14T23:33:21"
+    }
+  ]
+}
